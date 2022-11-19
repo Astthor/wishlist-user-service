@@ -7,8 +7,6 @@ export enum FriendStatus {
 
 
 export const getFriendStatus = (friendStatus: string) => {
-	console.log("friendStatus to upper case: " + friendStatus.toUpperCase())
-	console.log("friendstatus.invited: " + FriendStatus.INVITED);
 	switch(friendStatus.toUpperCase()){
 		case 'INVITED':
       return FriendStatus.INVITED;

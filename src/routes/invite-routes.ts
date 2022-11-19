@@ -29,10 +29,12 @@ inviteRoutes.post('/send', async (req, res) => {
 // Accept invitation
 inviteRoutes.post('/accept', async (req, res) => {
 	try {
-		const { token, name, username } = req.body;
-		const acceptedResponse = await inviteService.acceptInvitation(token, name, username);
+		const { token, userId, name, username, email } = req.body;
+		const acceptedResponse = await inviteService.acceptInvitation(userId, token, name, username, email);
 		if(acceptedResponse === "INVALID TOKEN"){
 			res.status(403).send({error: "Invalid token - token might be too old, although that'd be weird, no expiration on tokens here!"});
+		} else if (acceptedResponse === "INVALID EMAIL") {
+			res.status(403).send({error: "Invalid email, does not match invite token!"});
 		} else {
 			res.json(acceptedResponse);
 		}

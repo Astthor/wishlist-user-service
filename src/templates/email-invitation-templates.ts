@@ -9,7 +9,7 @@ export const invitationEmail = (inviteFromUser: User, friendEmail: string, token
 		throw new Error('Invalid email address in invitation email');
 	}
 	
-	const url = "https://"+signupUrl+"?token="+token;
+	const url = signupUrl+"?email="+friendEmail+"&token="+token;
 	const subject = `Invite from ${inviteFromUser.name} to join our wishlist platform`;
 	const html = 
 	`

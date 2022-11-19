@@ -41,17 +41,18 @@ export const inviteRepository = {
 		
 		return friend;
 	},
-	async updateTempFriend(inviteFromUserId: string, user: User, oldStatus: FriendStatus, newStatus: FriendStatus): Promise<User | null>{
+	async updateTempFriend(inviteFromUserId: string, user: User, tempFriendId: string, oldStatus: FriendStatus, newStatus: FriendStatus): Promise<User | null>{
 		const result = await neo4jConnection(
 			`
 				MATCH (inviteFromUser:USER)-[r:FRIENDS_WITH]-(user:USER)
 				WHERE 
 					inviteFromUser.userId = $inviteFromUserId AND 
-					user.userId = $userId AND
+					user.userId = $tempFriendId AND
 					r.status = $oldStatus AND
 					r.originatorUserId = $inviteFromUserId
-				SET 
-					r.status = $newStatus, 
+				SET
+					r.status = $newStatus,
+					user.userId = $userId,
 					user.name = $name,
 					user.username = $username,
 					user.signupDate = $signupDate
@@ -59,9 +60,10 @@ export const inviteRepository = {
 			`,
 			{
 				inviteFromUserId: inviteFromUserId,
-				userId: user.userId,
+				tempFriendId: tempFriendId,
 				oldStatus: oldStatus,
 				newStatus: newStatus,
+				userId: user.userId,
 				name: user.name,
 				username: user.username,
 				signupDate: user.signupDate.toISOString(),

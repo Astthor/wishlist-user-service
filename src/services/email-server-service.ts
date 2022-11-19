@@ -5,7 +5,7 @@ import { invitationEmail } from "../templates/email-invitation-templates";
 const productionEnv = process.env.NODE_ENV === "production";
 const emailServer = productionEnv ? process.env.EMAIL_SERVER_URL_PROD : process.env.EMAIL_SERVER_URL_LOCAL;
 const emailServerQueryParams = productionEnv ? "?code="+process.env.EMAIL_SERVER_ACCESS : "";
-const emailServerUrl = emailServer + emailServerQueryParams;
+export const emailServerUrl = emailServer + emailServerQueryParams;
 
 export const sendEmailToEmailServer = async (inviteFromUser: User, friendEmail: string, token: string) => {
 	try {

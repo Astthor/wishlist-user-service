@@ -18,6 +18,17 @@ userRoutes.get('/', async (req, res) => {
 	}
 });
 
+userRoutes.get('/w-friends', async (req, res) => {
+	try {
+		const { userId } = req.body;
+		const dbResponse = await userService.getUserAndFriendsById(userId);
+		res.json(dbResponse);
+	} catch (e) {
+		console.log(`Error in userRoutes.get('/'): \n` + e.message);
+		res.status(500).send({error: e.message});
+	}
+});
+
 /**
  * Create User
  * Body
@@ -27,9 +38,9 @@ userRoutes.get('/', async (req, res) => {
  */
 userRoutes.post('/', async (req, res) => {
 	try{
-		const { name, username, email } = req.body;
+		const { userId, name, username, email } = req.body;
 		console.log("We've gotten to the router at least: " + name + ", " + username + " and " + email)
-		const dbResponse = await userService.createUser(name, username, email);
+		const dbResponse = await userService.createUser(userId, name, username, email);
 		res.json(dbResponse);
 	} catch(e: any) {
 		console.log("Error in userRoutes.post('/'): \n" + e.message);

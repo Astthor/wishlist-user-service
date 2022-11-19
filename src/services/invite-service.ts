@@ -30,19 +30,35 @@ export const inviteService = {
 		};
 		const tempUser = await inviteRepository.createTempFriend(userId, tempFriend);
 		if(tempUser.email === friendEmail){
-			return await sendEmailToEmailServer(inviteFromUser, friendEmail, token);
+			let emailSent;
+			try{
+				emailSent = await sendEmailToEmailServer(inviteFromUser, friendEmail, token);
+			} catch (e) {
+				console.log("[CAUGHT] Error sending email: " + e.message);
+			}
+			if(emailSent === true){
+				return true;
+			} else {
+				const deleted = await userService.deleteUser(tempUser.userId);
+				console.log("[DELETED TEMP USER]: " + JSON.stringify(deleted));
+				return false;
+			}
 		} else {
 			throw new Error('Could not create temporary friend with email: ' + friendEmail);
 		}
 	},
-	async acceptInvitation(token: string, name: string, username: string) {
+	async acceptInvitation(userId: string, token: string, name: string, username: string, email: string) {
 		const tokenObject = getTokenObject(token);
 		if(!token){
 			return "INVALID TOKEN";
 		}
+		if(email !== tokenObject.friendEmail){
+			return "INVALID EMAIL";
+		}
+
 		try {
 			const user: User = {
-				userId: tokenObject.friendId,
+				userId: userId,
 				name: name,
 				username: username,
 				email: tokenObject.friendEmail,
@@ -50,8 +66,8 @@ export const inviteService = {
 			}
 			const oldStatus = getFriendStatus("INVITED");
 			const newStatus = getFriendStatus("ACCEPTED");
-			const updatedFriend = await inviteRepository.updateTempFriend(tokenObject.inviteUserId, user, oldStatus, newStatus);
-			if(!updatedFriend || (updatedFriend.userId !== tokenObject.friendId)){
+			const updatedFriend = await inviteRepository.updateTempFriend(tokenObject.inviteUserId, user, tokenObject.friendId, oldStatus, newStatus);
+			if(!updatedFriend || (updatedFriend.userId !== userId)){
 				throw new Error("Couldn't save user into database! Repo returned: " + JSON.stringify(updatedFriend));
 			}
 			return updatedFriend;

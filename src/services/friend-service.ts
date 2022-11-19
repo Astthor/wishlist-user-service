@@ -1,6 +1,3 @@
-import User from "../models/User";
-import { v4 as uuid } from "uuid";
-import { isEmail } from "../validation/input-validation";
 import { getFriendStatus } from "../models/enums/FriendStatus";
 import { friendRepository } from "../repositories/friend-repository";
 import Friend from "../models/Friend";
